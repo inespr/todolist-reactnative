@@ -1,10 +1,11 @@
 import React from 'react'
 import { AiFillCheckCircle, AiFillCloseCircle } from 'react-icons/ai';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import CheckButtonProps from '../interfaces/CheckButtonProps';
 
-export const CheckButton = ({ clicked, setClicked }) => {
+export const CheckButton = ({ isChecked, onCheck }: CheckButtonProps) => {
   const handlePress = () => {
-    setClicked(!clicked);
+    onCheck(!isChecked);
   };
   return (
     <>
@@ -12,12 +13,12 @@ export const CheckButton = ({ clicked, setClicked }) => {
         style={[
           style.button,
           {
-            backgroundColor: clicked ? "blue" : "green",
+            backgroundColor: isChecked ? "blue" : "green",
           },
         ]}
         onPress={handlePress}
       >
-        {clicked ? (
+        {isChecked ? (
           <View style={style.wrapperButton}>
             <AiFillCloseCircle style={{ width: "30px", height: "30px" }} />{" "}
             <AiFillCheckCircle

@@ -1,10 +1,9 @@
 import React from 'react'
-import { View, Text } from 'react-native'
-import { TodoListScreen } from './src/screens/TodoListScreen';
+import { TaskList } from './src/screens/components/TaskList';
 
 const App = () => {
   return (
-    <TodoListScreen/>
+    <TaskList tasks={[]}/>
   )
 }
 

@@ -1,86 +1,116 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Button,
   StyleSheet,
+  Text,
   TextInput,
   TouchableHighlight,
   View,
 } from "react-native";
 import CalendarPicker from "react-native-calendar-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AiFillCloseCircle } from "react-icons/ai";
+import { AiFillCloseCircle, AiOutlineCheck } from "react-icons/ai";
+import TaskFormProps from "../interfaces/TaskFormProps";
+import Task from "../interfaces/Task";
+import moment from "moment";
+import { v4 as uuidv4 } from "uuid";
 
-export const TaskForm = ({ onSubmit }) => {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    selectedDate: new Date(),
-  });
-  const STORAGE_KEY = "@myApp:formData";
+export const TaskForm: React.FC<TaskFormProps> = ({
+  addTask,
+  children,
+  onAddTask,
+  selectedTask,
+}) => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const INITIAL_FORM_STATE = { title: "", description: "", date: "" };
+  const [formState, setFormState] = useState(INITIAL_FORM_STATE);
 
-  const handleSubmit = () => {
-    const { title } = formData;
-    if (title.trim()) {
-      onSubmit(formData);
-      saveFormData(formData);
-      setFormData({
+  const [newTask, setNewTask] = useState<Task>(() => {
+    if (selectedTask) {
+      console.log(selectedTask, 'selected');
+      return { ...selectedTask, selectedTask: undefined };
+    }  else {
+      return {
+        id: uuidv4(),
         title: "",
         description: "",
-        selectedDate: new Date(),
-      });
+        selectedDate: "",
+        isChecked: true,
+        isEdit: true,
+      };
     }
+  });
+  
+
+  const [error, setError] = useState("");
+
+  const handleAddTask = () => {
+    console.log(newTask);
+    setFormState(INITIAL_FORM_STATE);
+    if (!newTask.title) {
+      setError("Title is required");
+      return;
+    } else if (!newTask.selectedDate) {
+      setError("Date is required");
+      return;
+    } else if (!newTask.title && !newTask.selectedDate) {
+      setError("Date and Title are required");
+    }
+  
+    onAddTask(newTask);
+    setNewTask({
+      id: uuidv4(),
+      title: "",
+      description: "",
+      selectedDate: "",
+      isChecked: true,
+      isEdit: true,
+    });
   };
 
-  const saveFormData = async (formData) => {
-    try {
-      const jsonFormData = JSON.stringify(formData);
-      await AsyncStorage.setItem(STORAGE_KEY, jsonFormData);
-      console.log("Form data saved successfully");
-    } catch (error) {
-      console.error("Error while saving form data:", error);
-    }
+  const [calendarVisible, setCalendarVisible] = useState<boolean>(false);
+
+  const handleDateSelect = (date: moment.Moment) => {
+    setNewTask({ ...newTask, selectedDate: date.toISOString() });
+    setCalendarVisible(false);
   };
 
   return (
     <View style={styles.formWrapper}>
       <View style={styles.form}>
         <View style={{ alignItems: "flex-end", width: "100%" }}>
-          <TouchableHighlight>
-            <AiFillCloseCircle
-              style={{
-                width: "30px",
-                height: "30px",
-                color: "grey",
-                alignSelf: "flex-end",
-              }}
-            />
-          </TouchableHighlight>
+          {children}
         </View>
         <TextInput
           style={styles.input}
-          value={formData.title}
-          onChangeText={(title) =>
-            setFormData({ ...formData, title: title })
-          }
+          value={newTask.title}
+          onChangeText={(text) => setNewTask({ ...newTask, title: text })}
           placeholder="Add a task"
         />
+        {error == "Title is required" ? (
+          <Text style={styles.error}>{error}</Text>
+        ) : null}
         <TextInput
           style={styles.input}
-          value={formData.description}
-          onChangeText={(description) =>
-            setFormData({ ...formData, description: description })
-          }
+          value={newTask.description}
+          onChangeText={(text) => setNewTask({ ...newTask, description: text })}
           placeholder="Add a description"
         />
         <CalendarPicker
-          onDateChange={(date) =>
-            setFormData({ ...formData, selectedDate: date })
-          }
+          onDateChange={handleDateSelect}
+          selectedStartDate={new Date(newTask.selectedDate)}
           textStyle={{
             color: "white",
           }}
         />
-        <Button title="Add" onPress={handleSubmit} />
+        {error == "Date is required" ? (
+          <Text style={styles.error}>{error}</Text>
+        ) : null}
+        {error == "Date and Title are required" ? (
+          <Text style={styles.error}>{error}</Text>
+        ) : null}
+        <TouchableHighlight onPress={handleAddTask}>
+          <AiOutlineCheck />
+        </TouchableHighlight>
       </View>
     </View>
   );
@@ -88,10 +118,10 @@ export const TaskForm = ({ onSubmit }) => {
 
 const styles = StyleSheet.create({
   formWrapper: {
-    flex: 1,
     backgroundColor: "black",
     alignItems: "center",
     justifyContent: "center",
+    flex: 1,
   },
   form: {
     borderRadius: 20,
@@ -115,5 +145,9 @@ const styles = StyleSheet.create({
     color: "white",
     width: "100%",
   },
+  error: {
+    color: "red",
+    fontSize: 12,
+    marginTop: 5,
+  },
 });
-

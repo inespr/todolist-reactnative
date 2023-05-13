@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+{
+  /* import React, { useEffect, useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -71,7 +72,23 @@ export const TodoListScreen = () => {
     }));
 
     setShowForm(false);
+    
   };
+
+  const listTasksByDay = useMemo(() => {
+    const tasksByDays: {[key: string]: TaskList[]}  = {};
+    const tasks: TaskList[] = [];  sacarlas del storage o de un API context global
+
+    tasks.forEach((task) => {
+      TODO: comprobar cada elemento y meterlo en el objeto de dias
+      if(tasksByDays['20/03/2023']) {
+        tasksByDays['20/03/2023'].push({});
+      } else {
+        tasksByDays['20/03/2023'] = [{}];
+      }
+    });
+    return tasksByDays;
+  });
 
   return (
     <View style={style.page}>
@@ -96,7 +113,7 @@ export const TodoListScreen = () => {
           </View>
         )}
 
-        {Object.keys(tasksByDay).map(([dateKey, tasks]) => (
+        {Object.entries(tasksByDay).map(([dateKey, tasks]: [string, TaskData[]]) => (
           <View key={dateKey} style={style.taskContainer}>
             <View style={style.secondtitleWrapper}>
               <BsFillCheckSquareFill style={{ color: "white" }} />
@@ -182,4 +199,5 @@ const style = StyleSheet.create({
     height: "100%",
     borderRadius: 10,
   },
-});
+});/*/
+}
