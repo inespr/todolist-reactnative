@@ -1,4 +1,4 @@
-import Task from "./Task";
+import Task from "./TaskProps";
 
 interface TaskItemProps {
   task: Task;
@@ -7,4 +7,3 @@ interface TaskItemProps {
 }
 
 export default TaskItemProps;
-

@@ -1,4 +1,4 @@
-import Task from "./Task";
+import Task from "./TaskProps";
 
 interface TaskListProps {
   tasks: Task[];
