@@ -4,29 +4,55 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableHighlight,
-  TouchableHighlightBase,
   TouchableOpacity,
   View,
 } from "react-native";
 import { TaskItem } from "./TaskItem";
-import Task from "../interfaces/Task";
+import Task from "../interfaces/TaskProps";
 import { TaskForm } from "./TaskForm";
 import TaskListProps from "../interfaces/TaskListProps";
-import { AiFillCloseCircle, AiFillDelete, AiFillEdit } from "react-icons/ai";
+import {
+  AiFillCloseCircle,
+  AiFillDelete,
+  AiFillEdit,
+  AiOutlineLine,
+  AiOutlineClose,
+} from "react-icons/ai";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import { RiSettings3Fill } from "react-icons/ri";
 import { BsFillCheckSquareFill } from "react-icons/bs";
+import { v4 as uuidv4 } from "uuid";
+import {
+  TbSortAscendingLetters,
+  TbSortDescendingLetters,
+} from "react-icons/tb";
 
 export const TaskList: React.FC<TaskListProps> = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isFormEditDeleteVisible, setTsFormEditDeleteVisible] = useState(false);
+  const [sortOrder, setSortOrder] = useState("asc");
   const [selectedDate, setSelectedDate] = useState(
     moment().format("YYYY-MM-DD")
   );
   const [selectTask, setSelectTask] = useState<Task>();
   const [isEditing, setIsEditing] = useState(false);
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+  };
+
+  const sortTasks = () => {
+    const sortedTasks = [...tasks].sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a.title.localeCompare(b.title);
+      } else {
+        return b.title.localeCompare(a.title);
+      }
+    });
+    setTasks(sortedTasks);
+    toggleSortOrder();
+  };
 
   const addTask = async (newTask: Task) => {
     const taskDate = moment(newTask.selectedDate).format("dddd, MMMM Do, YYYY");
@@ -51,6 +77,15 @@ export const TaskList: React.FC<TaskListProps> = () => {
   };
 
   const handleAddTask = async (newTask: Task) => {
+    setSelectTask({
+      id: uuidv4(),
+      title: "",
+      description: "",
+      selectedDate: "",
+      isChecked: true,
+      isEdit: true,
+    });
+    setTsFormEditDeleteVisible(false);
     if (isEditing) {
       await updateTask(newTask);
       setIsEditing(false);
@@ -163,6 +198,18 @@ export const TaskList: React.FC<TaskListProps> = () => {
           <Text style={style.textTitle}>To Do</Text>
           <RiSettings3Fill style={{ color: "white", fontSize: 34 }} />
         </View>
+        <TouchableOpacity onPress={sortTasks}>
+          {sortOrder == "asc" ? (
+            <TbSortAscendingLetters
+              style={{ color: "white", width: 25, height: 25 }}
+            />
+          ) : (
+            <TbSortDescendingLetters
+              style={{ color: "white", width: 25, height: 25 }}
+            />
+          )}
+        </TouchableOpacity>
+
         <ScrollView
           style={style.scrollSection}
           scrollIndicatorInsets={{ right: 10 }}
@@ -176,17 +223,13 @@ export const TaskList: React.FC<TaskListProps> = () => {
                 <View style={style.taskSection}>
                   {section.data.map((task) => (
                     <>
-                      <TouchableOpacity style={style.rowFront}>
-                        <View style={style.menu}>
-                          <TouchableOpacity onPress={() => deleteTask(task.id)}>
-                            <AiFillDelete />
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => handleEditTask(task.id, task.isEdit)}
-                          >
-                            <AiFillEdit style={{ color: "yellow" }} />
-                          </TouchableOpacity>
-                        </View>
+                      <TouchableOpacity
+                        style={style.rowFront}
+                        onPress={() =>
+                          setTsFormEditDeleteVisible(!isFormEditDeleteVisible)
+                        }
+                      >
+                        <View style={style.menu}></View>
                         <TaskItem
                           key={task.id}
                           task={task}
@@ -198,6 +241,34 @@ export const TaskList: React.FC<TaskListProps> = () => {
                           }
                         />
                       </TouchableOpacity>
+                      {isFormEditDeleteVisible ? (
+                        <>
+                          <View style={style.menuWrapper}>
+                            <TouchableOpacity
+                              onPress={() => setTsFormEditDeleteVisible(false)}
+                            >
+                              <AiOutlineClose style={style.iconMenuClose} />
+                            </TouchableOpacity>
+                            <View style={style.menu}>
+                              <TouchableOpacity
+                                onPress={() =>
+                                  handleEditTask(task.id, task.isEdit)
+                                }
+                              >
+                                <AiFillEdit style={style.iconMenu} />
+                              </TouchableOpacity>
+                              <AiOutlineLine style={style.iconLineMenu} />
+                              <TouchableOpacity
+                                onPress={() => deleteTask(task.id)}
+                              >
+                                <AiFillDelete style={style.iconMenu} />
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                        </>
+                      ) : (
+                        ""
+                      )}
                     </>
                   ))}
                 </View>
@@ -300,10 +371,24 @@ const style = StyleSheet.create({
   task: {
     display: "flex",
   },
-  menu: {
+  menuWrapper: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+
     width: "100%",
+  },
+  menu: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  iconMenu: { color: "white", width: 25, height: 25 },
+  iconMenuClose: { color: "white", width: 20, height: 20 },
+  iconLineMenu: {
+    color: "gray",
+    width: 25,
+    height: 25,
+    rotate: "90deg",
   },
   addButtonText: {
     color: "white",
