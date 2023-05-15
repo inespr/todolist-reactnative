@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,20 +7,17 @@ import {
   View,
 } from "react-native";
 import CalendarPicker from "react-native-calendar-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AiFillCloseCircle, AiOutlineCheck } from "react-icons/ai";
+import { AiOutlineCheck } from "react-icons/ai";
 import TaskFormProps from "../interfaces/TaskFormProps";
 import Task from "../interfaces/Task";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 
 export const TaskForm: React.FC<TaskFormProps> = ({
-  addTask,
   children,
   onAddTask,
   selectedTask,
 }) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
   const INITIAL_FORM_STATE = { title: "", description: "", date: "" };
   const [formState, setFormState] = useState(INITIAL_FORM_STATE);
 
@@ -40,7 +37,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     }
   });
   
-
+  const [calendarVisible, setCalendarVisible] = useState<boolean>(false);
+  
   const [error, setError] = useState("");
 
   const handleAddTask = () => {
@@ -67,7 +65,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     });
   };
 
-  const [calendarVisible, setCalendarVisible] = useState<boolean>(false);
 
   const handleDateSelect = (date: moment.Moment) => {
     setNewTask({ ...newTask, selectedDate: date.toISOString() });

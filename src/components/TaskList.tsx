@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TouchableHighlight,
+  TouchableHighlightBase,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -12,10 +13,9 @@ import { TaskItem } from "./TaskItem";
 import Task from "../interfaces/Task";
 import { TaskForm } from "./TaskForm";
 import TaskListProps from "../interfaces/TaskListProps";
-import { AiFillCloseCircle, AiFillDelete } from "react-icons/ai";
+import { AiFillCloseCircle, AiFillDelete, AiFillEdit } from "react-icons/ai";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
-import { SwipeListView } from "react-native-swipe-list-view";
 import { RiSettings3Fill } from "react-icons/ri";
 import { BsFillCheckSquareFill } from "react-icons/bs";
 
@@ -28,7 +28,6 @@ export const TaskList: React.FC<TaskListProps> = () => {
   const [selectTask, setSelectTask] = useState<Task>();
   const [isEditing, setIsEditing] = useState(false);
 
-
   const addTask = async (newTask: Task) => {
     const taskDate = moment(newTask.selectedDate).format("dddd, MMMM Do, YYYY");
 
@@ -38,7 +37,7 @@ export const TaskList: React.FC<TaskListProps> = () => {
     if (moment(newTask.selectedDate).isSame(selectedDate, "day")) {
       const updatedTasks = [...tasks, newTask];
       const daySections = getDaySections(updatedTasks, selectedDate);
-      console.log(updatedTasks)
+      console.log(updatedTasks);
       setTasks(updatedTasks);
     } else {
       {
@@ -50,7 +49,6 @@ export const TaskList: React.FC<TaskListProps> = () => {
       setTasks(updatedTasks);
     }
   };
-  
 
   const handleAddTask = async (newTask: Task) => {
     if (isEditing) {
@@ -78,16 +76,15 @@ export const TaskList: React.FC<TaskListProps> = () => {
     const updatedTasks = tasks.map((task) =>
       task.id === updatedTask.id ? updatedTask : task
     );
-  
+
     try {
       await AsyncStorage.setItem("tasks", JSON.stringify(updatedTasks));
     } catch (error) {
       console.error("Error while updating task:", error);
     }
-  
+
     setTasks(updatedTasks);
   };
-  
 
   useEffect(() => {
     {
@@ -97,7 +94,7 @@ export const TaskList: React.FC<TaskListProps> = () => {
       try {
         const tasksJson = await AsyncStorage.getItem("tasks");
         const tasks = tasksJson != null ? JSON.parse(tasksJson) : {};
-        console.log('render')
+        console.log("render");
         setTasks(tasks);
       } catch (error) {
         console.log(error);
@@ -108,7 +105,9 @@ export const TaskList: React.FC<TaskListProps> = () => {
   }, []);
 
   const getDaySections = (tasks: Task[], selectedDate: string) => {
-    // Create a map with a key for each date with tasks, and an array of tasks as value
+    {
+      /*Create a map with a key for each date with tasks, and an array of tasks as value*/
+    }
     const taskMap: { [key: string]: Task[] } = {};
     tasks.forEach((task) => {
       const taskDate = moment(task.selectedDate).format("dddd, MMMM Do, YYYY");
@@ -119,10 +118,14 @@ export const TaskList: React.FC<TaskListProps> = () => {
       }
     });
 
-    // Create an array of section titles for each date with tasks
+    {
+      /*Create an array of section titles for each date with tasks*/
+    }
     const sectionTitles = Object.keys(taskMap);
 
-    // Create a section for each date with tasks and add the corresponding tasks
+    {
+      /*Create a section for each date with tasks and add the corresponding tasks*/
+    }
     const daySections = sectionTitles.map((title) => ({
       title,
       data: taskMap[title],
@@ -132,6 +135,7 @@ export const TaskList: React.FC<TaskListProps> = () => {
   };
 
   const sections = getDaySections(tasks, selectedDate);
+  console.log(sections);
 
   const deleteTask = async (taskId: string) => {
     try {
@@ -144,17 +148,14 @@ export const TaskList: React.FC<TaskListProps> = () => {
   };
 
   const handleEditTask = (taskId: string, isEdit: boolean) => {
-    isEdit = true;
-    const taskToEdit = tasks.find(task => task.id === taskId);
+    isEdit == true;
+    const taskToEdit = tasks.find((task) => task.id === taskId);
     setIsEditing(true);
-    console.log('editing...', taskToEdit, isEditing)
+    console.log("editing...", taskToEdit, isEditing);
     setSelectTask(taskToEdit);
     setIsFormVisible(true);
   };
 
- 
-  
-  
   return (
     <View style={style.taskList}>
       <View style={style.tasks}>
@@ -162,7 +163,10 @@ export const TaskList: React.FC<TaskListProps> = () => {
           <Text style={style.textTitle}>To Do</Text>
           <RiSettings3Fill style={{ color: "white", fontSize: 34 }} />
         </View>
-        <ScrollView style={style.scrollSection}>
+        <ScrollView
+          style={style.scrollSection}
+          scrollIndicatorInsets={{ right: 10 }}
+        >
           {sections.map((section) => (
             <View key={section.title}>
               <Text style={style.taskTitle}>
@@ -172,22 +176,28 @@ export const TaskList: React.FC<TaskListProps> = () => {
                 <View style={style.taskSection}>
                   {section.data.map((task) => (
                     <>
-                      <TouchableHighlight onPress={() => deleteTask(task.id)}>
-                        <Text style={{ color: "red" }}>DELETE</Text>
-                      </TouchableHighlight>
-                      <TouchableOpacity onPress={() => handleEditTask(task.id, task.isEdit)}>
-                        <Text>Edit</Text>
+                      <TouchableOpacity style={style.rowFront}>
+                        <View style={style.menu}>
+                          <TouchableOpacity onPress={() => deleteTask(task.id)}>
+                            <AiFillDelete />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() => handleEditTask(task.id, task.isEdit)}
+                          >
+                            <AiFillEdit style={{ color: "yellow" }} />
+                          </TouchableOpacity>
+                        </View>
+                        <TaskItem
+                          key={task.id}
+                          task={task}
+                          onDelete={(id) =>
+                            setTasks(tasks.filter((task) => task.id !== id))
+                          }
+                          onCheck={(id, isChecked) =>
+                            updateTask({ ...task, isChecked })
+                          }
+                        />
                       </TouchableOpacity>
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        onDelete={(id) =>
-                          setTasks(tasks.filter((task) => task.id !== id))
-                        }
-                        onCheck={(id, isChecked) =>
-                          updateTask({ ...task, isChecked })
-                        }
-                      />
                     </>
                   ))}
                 </View>
@@ -206,7 +216,11 @@ export const TaskList: React.FC<TaskListProps> = () => {
               animationType="slide"
               style={style.form}
             >
-              <TaskForm addTask={addTask} onAddTask={handleAddTask} selectedTask={selectTask} >
+              <TaskForm
+                addTask={addTask}
+                onAddTask={handleAddTask}
+                selectedTask={selectTask}
+              >
                 <TouchableOpacity
                   style={style.closeButton}
                   onPress={() => setIsFormVisible(false)}
@@ -232,6 +246,10 @@ export const TaskList: React.FC<TaskListProps> = () => {
 };
 
 const style = StyleSheet.create({
+  rowFront: {
+    justifyContent: "space-between",
+    width: "100%",
+  },
   taskTitle: {
     color: "white",
     textAlign: "left",
@@ -282,6 +300,11 @@ const style = StyleSheet.create({
   task: {
     display: "flex",
   },
+  menu: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
   addButtonText: {
     color: "white",
   },
@@ -318,6 +341,9 @@ const style = StyleSheet.create({
   scrollSection: {
     flexGrow: 1,
     maxHeight: 470,
+    minHeight: 470,
     overflowY: "scroll",
+    scrollColor: " rgba(0, 0, 0, .5) rgba(0, 0, 0, 0)",
+    scrollbarWidth: "thin",
   },
 });
