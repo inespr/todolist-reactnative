@@ -1,5 +1,5 @@
 import React from 'react'
-import { TaskList } from './src/screens/components/TaskList';
+import { TaskList } from './src/components/TaskList';
 
 const App = () => {
   return (
