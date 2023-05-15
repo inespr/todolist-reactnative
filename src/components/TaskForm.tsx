@@ -9,7 +9,7 @@ import {
 import CalendarPicker from "react-native-calendar-picker";
 import { AiOutlineCheck } from "react-icons/ai";
 import TaskFormProps from "../interfaces/TaskFormProps";
-import Task from "../interfaces/Task";
+import Task from "../interfaces/TaskProps";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 
@@ -18,14 +18,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   onAddTask,
   selectedTask,
 }) => {
-  const INITIAL_FORM_STATE = { title: "", description: "", date: "" };
-  const [formState, setFormState] = useState(INITIAL_FORM_STATE);
-
   const [newTask, setNewTask] = useState<Task>(() => {
     if (selectedTask) {
-      console.log(selectedTask, 'selected');
+      console.log(selectedTask, "selected");
       return { ...selectedTask, selectedTask: undefined };
-    }  else {
+    } else {
       return {
         id: uuidv4(),
         title: "",
@@ -37,13 +34,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     }
   });
   
-  const [calendarVisible, setCalendarVisible] = useState<boolean>(false);
-  
+
   const [error, setError] = useState("");
 
   const handleAddTask = () => {
     console.log(newTask);
-    setFormState(INITIAL_FORM_STATE);
     if (!newTask.title) {
       setError("Title is required");
       return;
@@ -53,7 +48,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     } else if (!newTask.title && !newTask.selectedDate) {
       setError("Date and Title are required");
     }
-  
+
     onAddTask(newTask);
     setNewTask({
       id: uuidv4(),
@@ -65,10 +60,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     });
   };
 
-
   const handleDateSelect = (date: moment.Moment) => {
     setNewTask({ ...newTask, selectedDate: date.toISOString() });
-    setCalendarVisible(false);
   };
 
   return (
