@@ -1,10 +1,8 @@
-import React from 'react'
-import { TaskList } from './src/components/TaskList';
+import React from "react";
+import { TasksListScreen } from "./src/screens/TasksListScreen";
 
 const App = () => {
-  return (
-    <TaskList tasks={[]}/>
-  )
-}
+  return <TasksListScreen tasks={[]}/>;
+};
 
 export default App;
