@@ -11,7 +11,7 @@ import { AiOutlineCheck } from "react-icons/ai";
 import TaskFormProps from "../interfaces/TaskFormProps";
 import Task from "../interfaces/TaskProps";
 import moment from "moment";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as Uuidv4 } from "uuid";
 
 export const TaskForm: React.FC<TaskFormProps> = ({
   children,
@@ -21,10 +21,10 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const [newTask, setNewTask] = useState<Task>(() => {
     if (selectedTask) {
       console.log(selectedTask, "selected");
-      return { ...selectedTask, selectedTask: undefined };
+      return { ...selectedTask, selectedTask : undefined };
     } else {
       return {
-        id: uuidv4(),
+        id: Uuidv4(),
         title: "",
         description: "",
         selectedDate: "",
@@ -38,6 +38,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const [error, setError] = useState("");
 
   const handleAddTask = () => {
+    
     console.log(newTask);
     if (!newTask.title) {
       setError("Title is required");
@@ -51,7 +52,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
     onAddTask(newTask);
     setNewTask({
-      id: uuidv4(),
+      id: Uuidv4(),
       title: "",
       description: "",
       selectedDate: "",
@@ -63,6 +64,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const handleDateSelect = (date: moment.Moment) => {
     setNewTask({ ...newTask, selectedDate: date.toISOString() });
   };
+  
 
   return (
     <View style={styles.formWrapper}>

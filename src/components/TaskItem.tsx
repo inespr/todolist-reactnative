@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { CheckButton } from "./CheckButton";
 import TaskItemProps from "../interfaces/TaskItemProps";
-import { AiFillDelete } from "react-icons/ai";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Task from "../interfaces/TaskProps";
 
 export const TaskItem = ({ task, onCheck }: TaskItemProps) => {
   const [isChecked, setIsChecked] = useState(task.isChecked); // Estado local para guardar el estado de la tarea
