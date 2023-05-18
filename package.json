@@ -17,7 +17,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.8.0",
-    "react-native": "0.71.7",
+    "react-native": "^0.71.7",
     "react-native-calendar-picker": "^7.1.4",
     "react-native-swipe-list-view": "^3.2.9",
     "react-native-web": "~0.18.10",
@@ -27,7 +27,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~18.0.27",
-    "@types/react-native": "^0.71.6",
+    "@types/react-native": "^0.71.7",
     "@types/react-native-calendar-picker": "^7.0.3",
     "@types/uuid": "^9.0.1"
   },
